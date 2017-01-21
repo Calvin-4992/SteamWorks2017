@@ -4,6 +4,7 @@ package org.usfirst.frc.team4992.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -49,8 +50,13 @@ public class Robot extends IterativeRobot {
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
+    NetworkTable CCTest;
+    public Robot(){
+    	CCTest = NetworkTable.getTable("GRIP/myContoursReport");//"GRIP/mycontoursreport is were the information should be stored"
+    }
+    
     public void robotInit() {
-		oi = new OI();
+    	oi = new OI();
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", new ExampleCommand());
         SmartDashboard.putData(drive);
@@ -58,13 +64,30 @@ public class Robot extends IterativeRobot {
         vision = NetworkTable.getTable("GRIP/myContoursReport");
         camera = CameraServer.getInstance().startAutomaticCapture();
         camera.setResolution(ImageWidth,ImageHeight);
-       pipe = new Pipeline ();
+        pipe = new Pipeline ();
+    	//cc
+		
         
     }
 	
     public void testPeriodic() {
-    	Mat matCam = new Mat (0);
-    	pipe.process(matCam);
+
+    	//cc
+    	Mat testCCMAT = new Mat();
+    	double[] defaultVal = new double[0];
+    		double[] areas = CCTest.getNumberArray("area", defaultVal);
+    		System.out.print("area: ");
+    		for(double area: areas){
+    			System.out.print(area + " ");
+    		}
+    		System.out.println();
+    		Timer.delay(1);
+    	///cc
+    	//NetworkTable visiontable = NetworkTable.getTable("vision");
+    	//boolean shouldFire = visiontable.getvalue();
+    	
+    	//cc
+
         LiveWindow.run();
     }
 
