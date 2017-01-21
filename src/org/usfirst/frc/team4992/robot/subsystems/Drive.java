@@ -2,9 +2,8 @@ package org.usfirst.frc.team4992.robot.subsystems;
 
 import org.usfirst.frc.team4992.robot.RobotMap;
 import org.usfirst.frc.team4992.robot.commands.StayGoodBoy;
-
 import com.ctre.CANTalon;
-
+import org.usfirst.frc.team4992.robot.*;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -13,13 +12,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Drive extends Subsystem {
     
-	//set up the drive CANTalon speed controllers 
-	CANTalon motorLeftBack = new CANTalon(RobotMap.backLeftMotor);
-	CANTalon motorRightBack = new CANTalon(RobotMap.backRightMotor);
-	CANTalon motorLeftFront = new CANTalon(RobotMap.frontLeftMotor);
-	CANTalon motorRightFront = new CANTalon(RobotMap.frontRightMotor);
-	RobotDrive drive = new RobotDrive(motorLeftFront,motorLeftBack,motorRightFront,motorRightBack);
-	
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
@@ -27,21 +19,20 @@ public class Drive extends Subsystem {
         // Set the default command for a subsystem here.
     	setDefaultCommand(new StayGoodBoy());
     }
-    
-    public void Stop(){
-    	drive.arcadeDrive(0,0);
-    }
-    
-    public void Backwards(){
-    	drive.arcadeDrive(-0.75,0);
-    }
-    
-    public void Forwards(){
-    	drive.arcadeDrive(0.75,0);
-    }
+
+    //Automus controler
     
     public void SetSpeed(float ForwardValue, float TurnValue){
-    	drive.arcadeDrive(ForwardValue, TurnValue);
+    	Robot.driveRobot.arcadeDrive(ForwardValue, TurnValue);
+    }
+    
+    //Normal Drive code use for operater control(uses stick information)
+    public void arcadeDrive (Boolean ReverseDriving){
+    	if(ReverseDriving){//Driving backwards
+    		Robot.driveRobot.arcadeDrive( OI.stick.getY(), OI.stick.getX() );
+    	} else {//Normal Drive
+    		Robot.driveRobot.arcadeDrive( -OI.stick.getY(), -OI.stick.getX() );
+    	}
     }
     
 }

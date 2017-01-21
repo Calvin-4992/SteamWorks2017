@@ -1,26 +1,28 @@
 package org.usfirst.frc.team4992.robot.commands;
 
-import org.usfirst.frc.team4992.robot.Robot;
 import edu.wpi.first.wpilibj.command.Command;
+import org.usfirst.frc.team4992.*;
+import org.usfirst.frc.team4992.robot.Robot;
 
 /**
- *	
+ *
  */
-public class StayGoodBoy extends Command {
+public class OperatorControled extends Command {
 
-    public StayGoodBoy() {
-        // Use requires() here to declare subsystem dependencies
+    public OperatorControled() {
     	requires(Robot.drive);
+    	requires(Robot.climb);
+    	requires(Robot.gear);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	//Robot.drive.Stop();//This method was deledted and will need to be changed so(possilbe delect this command it is pretty unless)
+    	
+    	Robot.drive.arcadeDrive(Robot.reverseDriveActive);
     }
 
     // Make this return true when this Command no longer needs to run execute()

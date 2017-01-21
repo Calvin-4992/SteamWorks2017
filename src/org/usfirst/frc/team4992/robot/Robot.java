@@ -4,6 +4,7 @@ package org.usfirst.frc.team4992.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -17,6 +18,8 @@ import org.usfirst.frc.team4992.robot.subsystems.Drive;
 import org.usfirst.frc.team4992.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team4992.robot.subsystems.GearLifter;
 
+import com.ctre.CANTalon;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,33 +31,38 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-
-	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+	
+	//varibles
+	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();//remove this then you remove the example subsystem
 	public static final Drive drive = new Drive();
 	public static final Climb climb = new Climb();
 	public static final GearLifter gear = new GearLifter();
 	public static OI oi;	
 	
 	protected static final int ImageWidth = 320;
-	
 	protected static final int ImageHeight = 240;
 	
-
+	//senors and random stuff
     Command autonomousCommand;
     SendableChooser chooser;
     NetworkTable vision;
     Pipeline pipe;
     UsbCamera camera;
-
-    /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
-     */
-    NetworkTable CCTest;
+    
+    //Motor controllers
+    CANTalon motorLeftBack; 
+	CANTalon motorRightBack;
+	CANTalon motorLeftFront ;
+	CANTalon motorRightFront;
+	public static RobotDrive driveRobot;
+	public static boolean reverseDriveActive;
+	
+    NetworkTable CCTest;//a test network table for the grip vision soft ware(but GRIP doesn't write information to netwrok tables so we will need to use and convert Mat into and array or just upload the mat if possible)
     public Robot(){
     	CCTest = NetworkTable.getTable("GRIP/myContoursReport");//"GRIP/mycontoursreport is were the information should be stored"
     }
     
+  //------------------------FRC methods-------------------------
     public void robotInit() {
     	oi = new OI();
         chooser = new SendableChooser();
@@ -65,9 +73,13 @@ public class Robot extends IterativeRobot {
         camera = CameraServer.getInstance().startAutomaticCapture();
         camera.setResolution(ImageWidth,ImageHeight);
         pipe = new Pipeline ();
-    	//cc
-		
         
+        motorLeftBack = new CANTalon(RobotMap.backLeftMotor);
+    	motorRightBack = new CANTalon(RobotMap.backRightMotor);
+    	motorLeftFront = new CANTalon(RobotMap.frontLeftMotor);
+    	motorRightFront = new CANTalon(RobotMap.frontRightMotor);
+    	driveRobot = new RobotDrive(motorLeftFront,motorLeftBack,motorRightFront,motorRightBack);
+    	reverseDriveActive = false;
     }
 	
     public void testPeriodic() {
@@ -90,16 +102,6 @@ public class Robot extends IterativeRobot {
 
         LiveWindow.run();
     }
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
-	 * using the dashboard. The sendable chooser code works with the Java SmartDashboard. If you prefer the LabVIEW
-	 * Dashboard, remove all of the chooser code and uncomment the getString code to get the auto name from the text box
-	 * below the Gyro
-	 *
-	 * You can add additional auto modes by adding additional commands to the chooser code above (like the commented example)
-	 * or additional comparisons to the switch structure below with additional strings & commands.
-	 */
     public void autonomousInit() {
         autonomousCommand = (Command) chooser.getSelected();
         
@@ -118,9 +120,6 @@ public class Robot extends IterativeRobot {
         if (autonomousCommand != null) autonomousCommand.start();
     }
 
-    /**
-     * This function is called periodically during autonomous
-     */
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
     }
@@ -133,15 +132,19 @@ public class Robot extends IterativeRobot {
         if (autonomousCommand != null) autonomousCommand.cancel();
     }
 
-    /**
-     * This function is called periodically during operator control
-     */
     public void teleopPeriodic() {
-        Scheduler.getInstance().run();
     }
     
-    /**
-     * This function is called periodically during test mode
-     */
-
+    
+    
+    //-------------Other non FRC provided methods-------------------------
+    
+    public boolean switchReverseDrive(boolean currentReverseDriveBooleanValue){//use this method by setting the revsere boolean to this method and put itself in the parameter EXAMPLE: reverseOn = switchReverseDrive(reverseOn); 
+    	if(currentReverseDriveBooleanValue){
+    		return false;
+    	} else{
+    		return true;
+    	}
+    }
+    
 }

@@ -1,6 +1,9 @@
 package org.usfirst.frc.team4992.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+
 import org.usfirst.frc.team4992.robot.commands.ExampleCommand;
 
 /**
@@ -8,6 +11,12 @@ import org.usfirst.frc.team4992.robot.commands.ExampleCommand;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
+	public static Joystick stick = new Joystick(0);
+	public static JoystickButton buttonX = new JoystickButton(stick, 1); //NOT SURE ABOUT THE NUMBER
+	public static JoystickButton buttonY = new JoystickButton(stick, 2); //NOT SURE ABOUT THE NUMBER
+	public static JoystickButton buttonA = new JoystickButton(stick, 3); //NOT SURE ABOUT THE NUMBER
+	public static JoystickButton buttonB = new JoystickButton(stick, 4); //NOT SURE ABOUT THE NUMBER
+	
     //// CREATING BUTTONS
     // One type of button is a joystick button which is any button on a joystick.
     // You create one by telling it which joystick it's on and which button

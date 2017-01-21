@@ -9,20 +9,20 @@ public class RobotMap {
 
 	//systems - drive, climb, gear
 	
-					//Drive
+	//Drive
 	public static int
-					backLeftMotor = 1,//CANtalon
-					backRightMotor = 2,//CANtalon
-					frontLeftMotor = 3,//CANtalon
-					frontRightMotor = 4,//CANtalon
-					//Climb
-					climberGear = 5,//CANtalon(probably)
-					//Gear
-					solenoidOutArms = 6,//Solenoid
-					solenoidInArms = 7,//Solenoid
-					solenoidPlatformUp = 8,//Solenoid
-					solenoidPlatformDown =9,//Solenoid
-					kicker = 10;//Not sure yet
+		backLeftMotor = 1,//CANtalon
+		backRightMotor = 2,//CANtalon
+		frontLeftMotor = 3,//CANtalon
+		frontRightMotor = 4,//CANtalon
+		//Climb
+		climberGear = 5,//CANtalon(probably)
+		//Gear
+		solenoidOutArms = 6,//Solenoid
+		solenoidInArms = 7,//Solenoid
+		solenoidPlatformUp = 8,//Solenoid
+		solenoidPlatformDown =9,//Solenoid
+		kicker = 10;//Not sure yet
 	
 
 	
