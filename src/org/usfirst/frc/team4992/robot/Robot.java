@@ -1,6 +1,8 @@
 
 package org.usfirst.frc.team4992.robot;
 
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -12,6 +14,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team4992.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4992.robot.subsystems.Climb;
 import org.usfirst.frc.team4992.robot.subsystems.Drive;
@@ -31,6 +36,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
+	
+	
+	Thread visionThread;//Used to start thread for vision processing
 	
 	//varibles
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();//remove this then you remove the example subsystem
@@ -80,6 +88,39 @@ public class Robot extends IterativeRobot {
     	motorRightFront = new CANTalon(RobotMap.frontRightMotor);
     	driveRobot = new RobotDrive(motorLeftFront,motorLeftBack,motorRightFront,motorRightBack);
     	reverseDriveActive = false;
+    	
+    	visionThread = new Thread(() -> {
+			UsbCamera cameraVis = CameraServer.getInstance().startAutomaticCapture();//get the camera feed
+			cameraVis.setResolution(320, 240);// Set the resolution
+			
+			//----------------
+			
+			CvSink cvSink = CameraServer.getInstance().getVideo();// Get a CvSink. This will capture Mats from the camera
+			CvSource outputStream = CameraServer.getInstance().putVideo("Rectangle", 640, 480);// Setup a CvSource. This will send images back to the Dashboard
+
+			Mat mat = new Mat();// Mats are very memory expensive. Lets reuse this Mat.
+
+			// This cannot be 'true'. The program will never exit if it is. This
+			// lets the robot stop this thread when restarting robot code or
+			// deploying.
+			while (!Thread.interrupted()) {
+				// Tell the CvSink to grab a frame from the camera and put it
+				// in the source mat.  If there is an error notify the output.
+				if (cvSink.grabFrame(mat) == 0) {
+					outputStream.notifyError(cvSink.getError());// Send the output the error.
+					continue;// skip the rest of the current iteration
+				}
+				// Calvin needs free will :)
+				pipe.process(mat);
+				
+				// Give the output stream a new image to display
+				outputStream.putFrame(mat);
+			}
+		});
+    	//set the vision thread to daemon
+    	visionThread.setDaemon(true);
+    	visionThread.start();
+    	
     }
 	
     public void testPeriodic() {
@@ -91,7 +132,7 @@ public class Robot extends IterativeRobot {
     		System.out.print("area: ");
     		for(double area: areas){
     			System.out.print(area + " ");
-    		g}
+    		}
     		System.out.println();
     		Timer.delay(1);
     	///cc
