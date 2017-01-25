@@ -5,26 +5,20 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team4992.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4992.robot.subsystems.Climb;
 import org.usfirst.frc.team4992.robot.subsystems.Drive;
 import org.usfirst.frc.team4992.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team4992.robot.subsystems.GearLifter;
-
 import com.ctre.CANTalon;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -93,8 +87,6 @@ public class Robot extends IterativeRobot {
 			UsbCamera cameraVis = CameraServer.getInstance().startAutomaticCapture();//get the camera feed
 			cameraVis.setResolution(320, 240);// Set the resolution
 			
-			//----------------
-			
 			CvSink cvSink = CameraServer.getInstance().getVideo();// Get a CvSink. This will capture Mats from the camera
 			CvSource outputStream = CameraServer.getInstance().putVideo("Rectangle", 640, 480);// Setup a CvSource. This will send images back to the Dashboard
 
@@ -112,12 +104,22 @@ public class Robot extends IterativeRobot {
 				}
 				// Calvin needs free will :)
 				pipe.process(mat);
-				
+				//STILL NEED TO GET THE IMAGE FROM PIPLINE example pipe.filterContoursOutput() and put it in the outputStream
+				for(int i=0;i<pipe.filterContoursOutput().size();i++){
+					 System.out.println( pipe.filterContoursOutput().get(i) );
+				}
 				// Give the output stream a new image to display
 				outputStream.putFrame(mat);
 			}
 		});
     	//set the vision thread to daemon
+    	System.out.println("////////////////////////////");
+    	System.out.println("////////////////////////////");
+    	System.out.println("////////////////////////////");
+    	System.out.println("////////////////////////////");
+    	System.out.println("////////////////////////////");
+    	System.out.println("////////////////////////////");
+    	System.out.println("SETUP vision thread");
     	visionThread.setDaemon(true);
     	visionThread.start();
     	
@@ -165,7 +167,13 @@ public class Robot extends IterativeRobot {
     		return false;
     	} else{
     		return true;
-    	}
-    }
+    	}//end of if-else
+    }//end of switchReverseDrive method
+    
+    //Sets the rumble of the joystick - smallRotateVal is the rumble for the left side - largeRotateVal is for the right side
+    public void rumbleJoystick(float smallRumbleVal,float largeRumbleVal){
+    	OI.stick.setRumble(RumbleType.kLeftRumble, smallRumbleVal);
+		OI.stick.setRumble(RumbleType.kRightRumble, largeRumbleVal);
+    }//end of rumble method
     
 }
