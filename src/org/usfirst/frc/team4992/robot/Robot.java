@@ -3,6 +3,7 @@ package org.usfirst.frc.team4992.robot;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -13,7 +14,13 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team4992.robot.commands.ExampleCommand;
+import org.usfirst.frc.team4992.robot.commands.OperatorControled;
 import org.usfirst.frc.team4992.robot.subsystems.Climb;
 import org.usfirst.frc.team4992.robot.subsystems.Drive;
 import org.usfirst.frc.team4992.robot.subsystems.ExampleSubsystem;
@@ -36,6 +43,7 @@ public class Robot extends IterativeRobot {
 	
 	//varibles
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();//remove this then you remove the example subsystem
+	public static final OperatorControled operatorControled = new OperatorControled();
 	public static final Drive drive = new Drive();
 	public static final Climb climb = new Climb();
 	public static final GearLifter gear = new GearLifter();
@@ -47,8 +55,6 @@ public class Robot extends IterativeRobot {
 	//senors and random stuff
     Command autonomousCommand;
     SendableChooser chooser;
-    NetworkTable vision;
-    Pipeline pipe;
     UsbCamera camera;
     
     //Motor controllers
@@ -71,10 +77,6 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", new ExampleCommand());
         SmartDashboard.putData(drive);
         SmartDashboard.putData("Auto mode", chooser);
-        vision = NetworkTable.getTable("GRIP/myContoursReport");
-        camera = CameraServer.getInstance().startAutomaticCapture();
-        camera.setResolution(ImageWidth,ImageHeight);
-        pipe = new Pipeline ();
         
         motorLeftBack = new CANTalon(RobotMap.backLeftMotor);
     	motorRightBack = new CANTalon(RobotMap.backRightMotor);
@@ -83,45 +85,9 @@ public class Robot extends IterativeRobot {
     	driveRobot = new RobotDrive(motorLeftFront,motorLeftBack,motorRightFront,motorRightBack);
     	reverseDriveActive = false;
     	
-    	visionThread = new Thread(() -> {
-			UsbCamera cameraVis = CameraServer.getInstance().startAutomaticCapture();//get the camera feed
-			cameraVis.setResolution(320, 240);// Set the resolution
-			
-			CvSink cvSink = CameraServer.getInstance().getVideo();// Get a CvSink. This will capture Mats from the camera
-			CvSource outputStream = CameraServer.getInstance().putVideo("Rectangle", 640, 480);// Setup a CvSource. This will send images back to the Dashboard
-
-			Mat mat = new Mat();// Mats are very memory expensive. Lets reuse this Mat.
-
-			// This cannot be 'true'. The program will never exit if it is. This
-			// lets the robot stop this thread when restarting robot code or
-			// deploying.
-			while (!Thread.interrupted()) {
-				// Tell the CvSink to grab a frame from the camera and put it
-				// in the source mat.  If there is an error notify the output.
-				if (cvSink.grabFrame(mat) == 0) {
-					outputStream.notifyError(cvSink.getError());// Send the output the error.
-					continue;// skip the rest of the current iteration
-				}
-				// Calvin needs free will :)
-				pipe.process(mat);
-				//STILL NEED TO GET THE IMAGE FROM PIPLINE example pipe.filterContoursOutput() and put it in the outputStream
-				for(int i=0;i<pipe.filterContoursOutput().size();i++){
-					 System.out.println( pipe.filterContoursOutput().get(i) );
-				}
-				// Give the output stream a new image to display
-				outputStream.putFrame(mat);
-			}
-		});
-    	//set the vision thread to daemon
-    	System.out.println("////////////////////////////");
-    	System.out.println("////////////////////////////");
-    	System.out.println("////////////////////////////");
-    	System.out.println("////////////////////////////");
-    	System.out.println("////////////////////////////");
-    	System.out.println("////////////////////////////");
-    	System.out.println("SETUP vision thread");
-    	visionThread.setDaemon(true);
-    	visionThread.start();
+    	//Camera setup for vision
+    	camera = CameraServer.getInstance().startAutomaticCapture();
+    	MjpegServer server = new MjpegServer(CameraServer.getInstance().toString(),1181);
     	
     }
 	
@@ -156,6 +122,7 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopPeriodic() {
+    	operatorControled.start();
     }
     
     

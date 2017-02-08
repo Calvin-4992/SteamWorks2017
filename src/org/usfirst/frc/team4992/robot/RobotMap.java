@@ -8,15 +8,16 @@ package org.usfirst.frc.team4992.robot;
 public class RobotMap {
 
 	//systems - drive, climb, gear
+	//CANtalon will be from 70-75
 	
 	//Drive
 	public static int
-		backLeftMotor = 1,//CANtalon
-		backRightMotor = 2,//CANtalon
-		frontLeftMotor = 3,//CANtalon
-		frontRightMotor = 4,//CANtalon
+		backLeftMotor = 40,//CANtalon
+		backRightMotor = 41,//CANtalon
+		frontLeftMotor = 42,//CANtalon
+		frontRightMotor = 43,//CANtalon
 		//Climb
-		climberGear = 5,//CANtalon(probably)
+		climberGear = 45,//CANtalon
 		//Gear
 		solenoidOutArms = 6,//Solenoid
 		solenoidInArms = 7,//Solenoid
