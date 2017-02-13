@@ -23,7 +23,11 @@ public class RobotMap {
 		solenoidInArms = 7,//Solenoid
 		solenoidPlatformUp = 8,//Solenoid
 		solenoidPlatformDown =9,//Solenoid
-		kicker = 10;//Not sure yet
+		kicker = 10,//Not sure yet
+	
+		xBoxContorllerPort = 0;
+		
+	public static double currentThreshHold = 0.0;
 	
 
 	

@@ -11,7 +11,7 @@ public class OperatorControled extends Command {
 
     public OperatorControled() {
     	requires(Robot.drive);
-    	requires(Robot.climb);
+    	requires(Robot.objClimb);
     	requires(Robot.gear);
     }
 
